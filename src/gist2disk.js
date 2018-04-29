@@ -3,30 +3,22 @@ const fs = require('fs');
 const join = require('path').join;
 const axios = require('axios');
 const config = require('./config');
+const { errorCheck } = require('./utilities');
 
 /**
  * Writes the files within a Github Gist to the specified file path.
  * @param { username: string, description: string, path: string } parameters: Inputs described below
  * @param { string } parameters.username: The Github username of the Gist owner
  * @param { string } parameters.description: The description of the Gist.
- * @param { string } parameters.path: The file path that the will be written to.
+ * @param { string } parameters.dirPath: The file path that the will be written to.
  */
 module.exports = async function(parameters) {
   const writeToDisk = util.promisify(fs.writeFile);
   const { username, description, dirPath } = parameters;
 
-  /* Input sanitation. */
-  for (const key in parameters) {
-    const param = parameters[key];
-
-    if (util.isUndefined(param)) {
-      throw new Error(config.isUndefinedError(key));
-    }
-
-    if (!util.isString(param)) {
-      throw new Error(config.isNotStringError);
-    }
-  }
+  errorCheck(username);
+  errorCheck(description);
+  errorCheck(dirPath);
 
   try {
     const response = await axios.get(config.gistApi(username));
@@ -34,6 +26,7 @@ module.exports = async function(parameters) {
     const readWritePromises = startReadWrite(gist.files);
     await Promise.all(readWritePromises);
   } catch (error) {
+    console.error(config.checkUsernameMsg); //eslint-ignore-line
     throw error;
   }
 
