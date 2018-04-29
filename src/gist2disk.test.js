@@ -53,7 +53,10 @@ describe('gist2Disk', async () => {
     try {
       assert.throws(await gist2Disk(faultyParams), Error);
     } catch (error) {
-      assert.strictEqual(error.message, config.noDescriptionError(faultyDescription));
+      assert.strictEqual(
+        error.message,
+        config.noDescriptionError(faultyDescription),
+      );
       return;
     }
   });

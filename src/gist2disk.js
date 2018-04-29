@@ -26,7 +26,6 @@ module.exports = async function(parameters) {
     const readWritePromises = startReadWrite(gist.files);
     await Promise.all(readWritePromises);
   } catch (error) {
-    console.error(config.checkUsernameMsg); //eslint-ignore-line
     throw error;
   }
 
