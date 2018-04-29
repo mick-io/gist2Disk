@@ -62,5 +62,5 @@ typings/
 .vscode
 .vs
 
-# Weird Mac File
+# DS_store Mac File
 .DS_store
