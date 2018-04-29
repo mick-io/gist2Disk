@@ -1,67 +1,89 @@
 const fs = require('fs');
 const assert = require('assert');
-const { it, before, describe, after } = require('mocha');
+const util = require('util');
+const mocha = require('mocha');
 const gist2Disk = require('./gist2disk');
 const config = require('./config');
 
-describe('gist2Disk', async () => {
+mocha.describe('gist2Disk', async () => {
+  const deleteFile = util.promisify(fs.unlink);
+  const readFile = util.promisify(fs.readFile);
   const username = 'mick-io';
   const description = 'gist2Disk Testing Gist';
   const dirPath = __dirname;
-  const filePath = `${dirPath}/testing-gist.txt`;
-  const testMessage = 'This is a test message for gist2Disk.';
-
-  before(() => {
+  const textFilePath = `${dirPath}/testing-text.txt`;
+  const jsonFilePath = `${dirPath}/testing-json.json`;
+  const testString = 'This is a test message for gist2Disk.';
+  const testObject = { Testing: 123 };
+  const throwsErrorCheck = async function(parameters, expectedError) {
     try {
-      fs.unlinkSync(filePath);
+      assert.throws(await gist2Disk(parameters), Error);
+    } catch (error) {
+      assert.strictEqual(error.message, expectedError);
+      return;
+    }
+  };
+
+  mocha.before(async () => {
+    try {
+      await Promise.all([deleteFile(textFilePath), deleteFile(jsonFilePath)]);
     } catch (error) {
       return;
     }
   });
 
   // eslint-disable-next-line
-  it("obtains a gist's data from the Github API & write it to disk", async () => {
+  mocha.it("obtains a gist's data from the Github API & write all it's files to disk", async () => {
     try {
       await gist2Disk({ username, description, dirPath });
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
-      assert.strictEqual(fileContent, testMessage);
+      const readTextPromise = readFile(textFilePath);
+      const readJsonPromise = readFile(jsonFilePath);
+      const [encodedText, encodedJson] = await Promise.all([readTextPromise, readJsonPromise]);
+      assert.strictEqual(encodedText.toString(), testString);
+      assert.strictEqual(JSON.parse(encodedJson).testing, testObject.testing);
     } catch (error) {
       throw error;
     }
   });
 
-  it('throws an error when a parameter is missing', async () => {
-    try {
-      assert.throws(
-        await gist2Disk({ username, description }),
-        config.isUndefinedError,
-      );
-    } catch (error) {
-      assert.strictEqual(error.message, config.isUndefinedError);
-      return;
-    }
+  mocha.it('throws an error when parameters are missing', async () => {
+    const promises = [];
+    [
+      { username, description },
+      { description, dirPath },
+      { dirPath, username },
+      { username },
+      { dirPath },
+      { description },
+      {},
+    ].map(parameters => {
+      promises.push(throwsErrorCheck(parameters, config.isUndefinedError));
+    });
+    await Promise.all(promises);
   });
 
-  it('throws an error when no gist with the description is found', async () => {
+  mocha.it('throws an error when no gist with the description is found', async () => {
     const faultyDescription = 'Invalid gist description';
+    const expectedError = config.noDescriptionError(faultyDescription);
     const faultyParams = {
       username,
       description: faultyDescription,
       dirPath,
     };
-
-    try {
-      assert.throws(await gist2Disk(faultyParams), Error);
-    } catch (error) {
-      assert.strictEqual(
-        error.message,
-        config.noDescriptionError(faultyDescription),
-      );
-      return;
-    }
+    await throwsErrorCheck(faultyParams, expectedError);
   });
 
-  after(() => {
-    fs.unlinkSync(filePath);
+  mocha.it('throws an error when a tilda is passed as part of the directory path', async () => {
+    const dirFilePath = '~/.vim';
+    const faultyParams = {
+      username,
+      description,
+      dirPath: dirFilePath,
+    };
+    await throwsErrorCheck(faultyParams, config.tildaUseError);
+  });
+
+  mocha.after(async () => {
+    await Promise.all([deleteFile(textFilePath), deleteFile(jsonFilePath)]);
   });
 });

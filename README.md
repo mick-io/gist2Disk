@@ -4,12 +4,14 @@ A program for conveniently writing any public Github Gist to disk.
 
 ## Getting Started
 
-``` shell
+Make sure the directories in your path exists before getting started.
+
+```shell
 git clone https://github.com/mick-io/gist2Disk.
 
 cd gist2Disk
 
-node <GithubUsername> <GistDescription> <DirPath>
+node index.js <Github username> <Gist description> <Directory Path that will be written to.>
 ```
 
 ### Built With

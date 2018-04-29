@@ -1,24 +1,21 @@
 const util = require('util');
 const fs = require('fs');
-const join = require('path').join;
 const axios = require('axios');
 const config = require('./config');
-const { errorCheck } = require('./utilities');
+const path = require('path');
+const { getFileExtension, errorChecks } = require('./utilities');
 
 /**
  * Writes the files within a Github Gist to the specified file path.
  * @param { username: string, description: string, path: string } parameters: Inputs described below
  * @param { string } parameters.username: The Github username of the Gist owner
  * @param { string } parameters.description: The description of the Gist.
- * @param { string } parameters.dirPath: The file path that the will be written to.
+ * @param { string } parameters.dirPath: The directory path that the will be written to.
  */
 module.exports = async function(parameters) {
+  errorChecks(parameters);
   const writeToDisk = util.promisify(fs.writeFile);
   const { username, description, dirPath } = parameters;
-
-  errorCheck(username);
-  errorCheck(description);
-  errorCheck(dirPath);
 
   try {
     const response = await axios.get(config.gistApi(username));
@@ -54,7 +51,7 @@ module.exports = async function(parameters) {
     const promises = [];
     for (const key in files) {
       const dataUrl = files[key].raw_url;
-      const filePath = join(dirPath, key);
+      const filePath = path.join(dirPath, key);
       const readWritePromise = readWriteData(dataUrl, filePath);
       promises.push(readWritePromise);
     }
@@ -65,13 +62,14 @@ module.exports = async function(parameters) {
    * Calls the Github API and gets raw text from a gist
    * returns a promise to write that text to disk.
    * @param { string } url: The url for the raw data that will be stringified and written to disk
-   * @param { string } dirPath: The file path that will be written to.
+   * @param { string } filePath: The file path that will be written to.
    */
   async function readWriteData(url, filePath) {
+    const isJSON = getFileExtension(filePath) === 'json';
     try {
       const response = await axios.get(url);
-      // const text = JSON.stringify(response.data, {}, 2);
-      return writeToDisk(filePath, response.data, config.encoding);
+      const data = isJSON ? JSON.stringify(response.data, undefined, 2) : response.data;
+      return writeToDisk(filePath, data);
     } catch (error) {
       throw error;
     }
