@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 const gist2Disk = require('./src/app');
+const os = require('os');
 
 let [, , username, description, dirPath] = process.argv;
 
-if (!dirPath) {
-  dirPath = __dirname;
-}
+dirPath = !dirPath ? __dirname : dirPath.replace('~', os.homedir());
 
 const params = { username, description, dirPath };
 

@@ -2,8 +2,6 @@ const util = require('util');
 const path = require('path');
 const config = require('./config');
 
-// TODO: Add Tilda support
-
 /**
  * Returns the file extension of any given path.
  * @param {string} filePath: The path with the desired file extension
@@ -24,7 +22,6 @@ exports.errorChecks = function(parameters) {
   valueCheck(username);
   valueCheck(description);
   valueCheck(dirPath);
-  tildaCheck(dirPath);
   createAbsolutePath(dirPath);
 };
 
@@ -39,16 +36,6 @@ function valueCheck(parameter) {
 
   if (!util.isString(parameter)) {
     throw new Error(config.isNotStringError);
-  }
-}
-
-/**
- *  Throws an error if the file path includes a tilda
- * @param { string } dirPath: The directory path to be error checked.
- */
-function tildaCheck(dirPath) {
-  if (dirPath.includes('~')) {
-    throw new Error(config.tildaUseError);
   }
 }
 
