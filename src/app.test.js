@@ -2,14 +2,14 @@ const fs = require('fs');
 const assert = require('assert');
 const util = require('util');
 const mocha = require('mocha');
-const gist2Disk = require('./gist2disk');
+const gist2Disk = require('./app');
 const config = require('./config');
 
 mocha.describe('gist2Disk', async () => {
   const deleteFile = util.promisify(fs.unlink);
   const readFile = util.promisify(fs.readFile);
   const username = 'mick-io';
-  const description = 'gist2Disk Testing Gist';
+  const description = 'gist2disk-testing-gist';
   const dirPath = __dirname;
   const textFilePath = `${dirPath}/testing-text.txt`;
   const jsonFilePath = `${dirPath}/testing-json.json`;

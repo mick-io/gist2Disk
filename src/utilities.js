@@ -2,6 +2,8 @@ const util = require('util');
 const path = require('path');
 const config = require('./config');
 
+// TODO: Add Tilda support
+
 /**
  * Returns the file extension of any given path.
  * @param {string} filePath: The path with the desired file extension

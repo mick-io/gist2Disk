@@ -1,22 +1,30 @@
 # gist2Disk
 
-A program for conveniently writing any public Github Gist to disk.
+A program for conveniently writing any public Github Gist to disk. Great for `.virmc`'s or config files.
 
 ## Getting Started
 
 Make sure the directories in your path exists before getting started.
+Only public Gist are support
+
+### On OS X or Unix matching #!/usr/bin/env node
 
 ```shell
 git clone https://github.com/mick-io/gist2Disk.
 
 cd gist2Disk
 
-node index.js <Github username> <Gist description> <Directory Path that will be written to.>
+./gist2disk <Github username> <Gist description> <File Path (optional: defaults to current directory)>
+
+# Example
+./gist2disk mick-io gist2dist-testing-gist
 ```
 
-### Built With
+Add to your PATH and use to your hearts content
 
-[Node.js](https://nodejs.org)
+## Requires
+
+[Node.js](https://nodejs.org) 7.6+
 
 ### Authors
 

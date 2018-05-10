@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./src/gist2disk.test.js"
+    "test": "mocha ./src/app.test.js"
   },
   "keywords": [],
   "author": "",
