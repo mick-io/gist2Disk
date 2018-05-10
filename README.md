@@ -1,6 +1,6 @@
 # gist2Disk
 
-A program for conveniently writing any public Github Gist to disk. Great for `.virmc`'s or config files.
+A program for conveniently writing any public Github Gist to disk. Great for config files.
 
 ## Getting Started
 
