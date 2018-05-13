@@ -73,16 +73,6 @@ mocha.describe('gist2Disk', async () => {
     await throwsErrorCheck(faultyParams, expectedError);
   });
 
-  mocha.it('throws an error when a tilda is passed as part of the directory path', async () => {
-    const dirFilePath = '~/.vim';
-    const faultyParams = {
-      username,
-      description,
-      dirPath: dirFilePath,
-    };
-    await throwsErrorCheck(faultyParams, config.tildaUseError);
-  });
-
   mocha.after(async () => {
     await Promise.all([deleteFile(textFilePath), deleteFile(jsonFilePath)]);
   });
